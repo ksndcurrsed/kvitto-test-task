@@ -1,0 +1,327 @@
+{
+  "info": {
+    "_postman_id": "0776da63-928e-47b0-bee4-795a7c9d62ab",
+    "name": "Kvitto тестовая коллекция",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "51817672",
+    "_collection_link": "https://go.postman.co/collection/51817672-0776da63-928e-47b0-bee4-795a7c9d62ab?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "1. Тарифы",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "2. Пост на новый платеж с промокодом",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"tariff_id\": 2,\r\n  \"email\": \"testclient@gmail.com\",\r\n  \"method\": \"sbp\",\r\n  \"promo_code\": \"kvitto10\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_url}}/payments",
+          "host": [
+            "{{api_url}}"
+          ],
+          "path": [
+            "payments"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "3. Создание рассрочки",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Idempotency-Key",
+            "value": "installment-001"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"tariff_id\": 2,\r\n  \"email\": \"testclient_1@gmail.com\",\r\n  \"method\": \"installment\",\r\n  \"installment_months\": 3\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_url}}/payments",
+          "host": [
+            "{{api_url}}"
+          ],
+          "path": [
+            "payments"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "4. Создание рассрочки идемпотентность",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Idempotency-Key",
+            "value": "installment-001"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"tariff_id\": 2,\r\n  \"email\": \"testclient_1@gmail.com\",\r\n  \"method\": \"installment\",\r\n  \"installment_months\": 3\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_url}}/payments",
+          "host": [
+            "{{api_url}}"
+          ],
+          "path": [
+            "payments"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "5. Получить платеж",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{api_url}}/payments/1",
+          "host": [
+            "{{api_url}}"
+          ],
+          "path": [
+            "payments",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "6. Получить платеж с фильтром",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{api_url}}/payments?email=testclient_1@gmail.com&status=pending",
+          "host": [
+            "{{api_url}}"
+          ],
+          "path": [
+            "payments"
+          ],
+          "query": [
+            {
+              "key": "email",
+              "value": "testclient_1@gmail.com"
+            },
+            {
+              "key": "status",
+              "value": "pending"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "7. Вебхук",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const secret = pm.environment.get(\"webhook_secret\");\r\nconst body = pm.request.body.raw;\r\n\r\nconst signature = CryptoJS\r\n    .HmacSHA256(body, secret)\r\n    .toString(CryptoJS.enc.Hex);\r\n\r\npm.request.headers.upsert({\r\n    key: \"X-Signature\",\r\n    value: signature\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"payment_id\": 1,\r\n  \"status\": \"succeeded\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_url}}/webhooks/bank",
+          "host": [
+            "{{api_url}}"
+          ],
+          "path": [
+            "webhooks",
+            "bank"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "8. Ошибочный статус",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const secret = pm.environment.get(\"webhook_secret\");\nconst body = pm.request.body.raw;\n\nconst signature = CryptoJS\n    .HmacSHA256(body, secret)\n    .toString(CryptoJS.enc.Hex);\n\npm.request.headers.upsert({\n    key: \"X-Signature\",\n    value: signature\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"payment_id\": 2,\r\n  \"status\": \"refunded\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_url}}/webhooks/bank",
+          "host": [
+            "{{api_url}}"
+          ],
+          "path": [
+            "webhooks",
+            "bank"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "9. Не настоящий промокод",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"tariff_id\": 1,\r\n  \"email\": \"student@example.com\",\r\n  \"method\": \"card\",\r\n  \"promo_code\": \"WRONG\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_url}}/payments",
+          "host": [
+            "{{api_url}}"
+          ],
+          "path": [
+            "payments"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "10. Несуществующий ID платежа",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"tariff_id\": 1,\r\n  \"email\": \"student@example.com\",\r\n  \"method\": \"card\",\r\n  \"promo_code\": \"WRONG\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{api_url}}/payments",
+          "host": [
+            "{{api_url}}"
+          ],
+          "path": [
+            "payments"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "11. Вебхук без подписи",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    }
+  ]
+}
